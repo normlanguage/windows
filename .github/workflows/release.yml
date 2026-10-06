@@ -1,0 +1,75 @@
+name: Windows module
+
+on:
+  pull_request:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2025
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: oracle
+          java-version: '25.0.2'
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Install Norm
+        run: |
+          New-Item -ItemType Directory -Force .tmp/toolchain | Out-Null
+          Invoke-WebRequest https://github.com/normlanguage/Norm/releases/download/v0.26.2/norm.exe -OutFile .tmp/toolchain/norm.exe
+          if ((Get-FileHash .tmp/toolchain/norm.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne '26fd5bb95ca97c229029d1b421f9b0411f66f35cb4a859dc976a6524ea3ec6d7') { throw 'Norm checksum mismatch.' }
+      - name: Build and verify module
+        run: |
+          ./scripts/build.ps1 -NormExecutable .tmp/toolchain/norm.exe
+          git diff --exit-code -- windows/module.norm
+          if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }
+      - name: Verify release tag
+        if: github.ref_type == 'tag'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $source = Get-Content windows/module.norm -Raw
+          $version = [regex]::Match($source, 'module\(name: "windows", version: (\d+)').Groups[1].Value
+          if ($env:RELEASE_TAG -cne "v$version") { throw 'Tag must match module version.' }
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-module
+          path: |
+            build/repository/**/*.nar
+            build/repository/**/*.nar.sha256
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: windows-module
+          path: dist
+      - name: Publish module
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          mapfile -t archives < <(find dist -name '*.nar')
+          test "${#archives[@]}" -eq 1
+          archive="${archives[0]}"
+          expected=$(tr -d '\r\n' < "$archive.sha256")
+          actual=$(sha256sum "$archive" | cut -d ' ' -f 1)
+          test "$expected" = "$actual"
+          gh release create "$RELEASE_TAG" "$archive" "$archive.sha256" --verify-tag --draft --title "Windows ${RELEASE_TAG#v}" --generate-notes
+          gh release edit "$RELEASE_TAG" --draft=false
