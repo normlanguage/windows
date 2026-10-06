@@ -1,7 +1,8 @@
 Module module() {
-  module(name: "windows", version: 1,
-    binding: jarBinding(target: mavenJar(group: "dev.normlanguage", artifact: "windows", version: "1", resolution: sha256("b8f7e306ddd908827c433ceefaf537903ae277e23c0a0338d8d68ca4cf11361e")), api: [
-      jarType(name: "NativeCredentials", members: ["protect", "unprotect"]),
+  module(name: "windows", version: 2,
+    binding: jarBinding(target: mavenJar(group: "dev.normlanguage", artifact: "windows", version: "2", resolution: sha256("424484fc2324687e917d839c951914d5a913a1be9e222e1adac4ae4da62184df")), api: [
+      jarType(name: "ApplicationFiles", members: ["materialize", "findExecutable", "executableOnPath"]),
+      jarType(name: "NativeCredentials", members: ["protect", "unprotect", "loadOrCreateToken"]),
       jarType(name: "StructuredText", members: ["matches", "pathSegments"]),
       jarType(name: "VerifiedArchive", members: ["new", "install", "cancel", "progress", "hash"]),
       jarType(name: "SystemSupport", members: ["validateProxy", "validateEndpoint", "probeProxy", "formatTime", "utf8Size"]),

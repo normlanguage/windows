@@ -1,8 +1,8 @@
 # Windows for Norm
 
-`windows` provides Norm APIs for Windows credentials, owned processes, desktop integration, bounded local HTTP/SSE, atomic storage and verified archives. Application protocols, credentials policy and business logic belong to consumers.
+`windows` provides Norm APIs for Windows credentials, owned processes, desktop integration, bounded local HTTP/SSE, atomic storage, verified archives, bundled resource materialization and protected token initialization. Application protocols, credentials policy and business logic belong to consumers.
 
-Declare `dependency(repository: "github", name: "windows", version: 1)` in your Norm module. The public API is selected by [module.norm](windows/module.norm); the published NAR bundles its pinned runtime dependencies. Consumers need neither Java source nor a separate Java build.
+Declare `dependency(repository: "github", name: "windows", version: 2)` in your Norm module. The public API is selected by [module.norm](windows/module.norm); the published NAR bundles its pinned runtime dependencies. Consumers need neither Java source nor a separate Java build.
 
 The supported platform is Windows x64. Platform adapters are implemented internally with JDK APIs and JNA. Norm-facing behavior is exercised by [API tests](windows/tests/platform_tests.norm), including real DPAPI and loopback HTTP. [Platform tests](src/test/java/dev/normlanguage/windows) cover process ownership, bounded streams, cancellation, archive integrity and storage locking.
 
