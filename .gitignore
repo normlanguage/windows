@@ -1,0 +1,5 @@
+.gradle/
+.tmp/
+.norm/
+build/
+*.log

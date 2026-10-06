@@ -1,0 +1,44 @@
+package windows
+
+import std.testing.Test
+import std.collections.mutableMap
+import windows.nativeCredentialsProtect
+import windows.nativeCredentialsUnprotect
+import windows.loopbackServerIdentifier
+import windows.atomicTextStoreDigest
+import windows.systemSupportUtf8Size
+import windows.localHttpSessionNew
+import windows.loopbackServerNew
+import windows.HttpExchangeHandle
+
+@Test
+Void credentialsUseTheCurrentWindowsUser() {
+  String text = "windows-library-test-" + loopbackServerIdentifier()!!
+  String protected = nativeCredentialsProtect(arg0: text)!!
+  require(condition: protected != text, message: "Credentials are protected")
+  require(condition: nativeCredentialsUnprotect(arg0: protected) == text, message: "Current user can decrypt")
+}
+
+@Test
+Void platformValuesRemainTypedThroughTheModule() {
+  require(condition: atomicTextStoreDigest(arg0: "") == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", message: "Digest contract")
+  require(condition: systemSupportUtf8Size(arg0: "你好") == 6, message: "UTF-8 byte length")
+}
+
+@Test
+Void httpHeadersCrossTheNormBoundary() {
+  var server = loopbackServerNew(arg0: 0, arg1: 1, arg2: 4096, arg3: 2)
+  server.start(arg0: (HttpExchangeHandle? exchange) {
+    if exchange != null {
+      exchange!!.respond(arg0: if exchange!!.header(arg0: "X-Caller") == "norm" { 204 } else { 400 }, arg1: "text/plain", arg2: "")
+    }
+  })
+  var session = localHttpSessionNew(arg0: "http://127.0.0.1:" + server.port().toString() + "/", arg1: 4096)
+  try {
+    var headers = mutableMap<String?, String?>()
+    headers.put(key: "X-Caller", value: "norm")
+    var response = session.request(arg0: "GET", arg1: "", arg2: headers, arg3: 2000)!!
+    try { require(condition: response.status() == 204, message: "Caller headers reach real HTTP") }
+    finally { response.close() }
+  } finally { session.close() server.close() }
+}
