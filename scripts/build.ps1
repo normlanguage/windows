@@ -6,7 +6,9 @@ $root = Split-Path $PSScriptRoot -Parent
 $NormExecutable = (Resolve-Path -LiteralPath $NormExecutable).Path
 & (Join-Path $root 'gradlew.bat') -p $root test publish --no-daemon
 if ($LASTEXITCODE -ne 0) { throw 'Windows platform build or tests failed.' }
-$normHome = Join-Path $root '.tmp/norm-home'
+$version = [regex]::Match((Get-Content (Join-Path $root 'windows/module.norm') -Raw), 'module\(name: "windows", version: (\d+)').Groups[1].Value
+$artifact = Get-Item (Join-Path $root "build/libs/windows-$version.jar")
+$normHome = Join-Path $root ('.tmp/norm-home/' + (Get-FileHash $artifact.FullName).Hash.ToLowerInvariant())
 $cache = Join-Path $normHome '.norm/cache/maven'
 New-Item -ItemType Directory -Force $cache | Out-Null
 Copy-Item -Path (Join-Path $root 'build/maven/*') -Destination $cache -Recurse -Force
