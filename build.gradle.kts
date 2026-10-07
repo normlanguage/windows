@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.normlanguage"
-version = Regex("""module\(name: "windows", version: (\d+)""")
+version = Regex("""artifact: "windows", version: "([^"]+)"""")
     .find(file("windows/module.norm").readText())!!.groupValues[1]
 
 repositories { mavenCentral() }

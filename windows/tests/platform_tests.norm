@@ -35,8 +35,8 @@ Void httpHeadersCrossTheNormBoundary() {
   })
   var session = localHttpSessionNew(arg0: "http://127.0.0.1:" + server.port().toString() + "/", arg1: 4096)
   try {
-    var headers = mutableMap<String?, String?>()
-    headers.put(key: "X-Caller", value: "norm")
+    var headers = mutableMap<String, String>()
+    headers.put(arg0: "X-Caller", arg1: "norm")
     var response = session.request(arg0: "GET", arg1: "", arg2: headers, arg3: 2000)!!
     try { require(condition: response.status() == 204, message: "Caller headers reach real HTTP") }
     finally { response.close() }

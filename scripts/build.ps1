@@ -6,7 +6,7 @@ $root = Split-Path $PSScriptRoot -Parent
 $NormExecutable = (Resolve-Path -LiteralPath $NormExecutable).Path
 & (Join-Path $root 'gradlew.bat') -p $root test publish --no-daemon
 if ($LASTEXITCODE -ne 0) { throw 'Windows platform build or tests failed.' }
-$version = [regex]::Match((Get-Content (Join-Path $root 'windows/module.norm') -Raw), 'module\(name: "windows", version: (\d+)').Groups[1].Value
+$version = [regex]::Match((Get-Content (Join-Path $root 'windows/module.norm') -Raw), 'artifact: "windows", version: "([^"]+)"').Groups[1].Value
 $artifact = Get-Item (Join-Path $root "build/libs/windows-$version.jar")
 $normHome = Join-Path $root ('.tmp/norm-home/' + (Get-FileHash $artifact.FullName).Hash.ToLowerInvariant())
 $cache = Join-Path $normHome '.norm/cache/maven'
@@ -19,6 +19,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Windows module resolution failed.' }
     & $NormExecutable test (Join-Path $root 'windows') --format json
     if ($LASTEXITCODE -ne 0) { throw 'Norm API tests failed.' }
+    & (Join-Path $root 'tests/source.ps1') -NormExecutable $NormExecutable -NormHome $normHome
     & $NormExecutable package (Join-Path $root 'windows') --output (Join-Path $root 'build/repository')
     if ($LASTEXITCODE -ne 0) { throw 'Norm module packaging failed.' }
 } finally { $env:JDK_JAVA_OPTIONS = $previous }

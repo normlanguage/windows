@@ -21,14 +21,18 @@ jobs:
           distribution: oracle
           java-version: '25.0.2'
       - uses: gradle/actions/setup-gradle@v6
-      - name: Install Norm
+      - uses: actions/checkout@v7
+        with:
+          repository: normlanguage/Norm
+          ref: 72efd7871380577c837807b11af68de1fcba81e2
+          path: .tmp/toolchain
+      - name: Build Norm
         run: |
-          New-Item -ItemType Directory -Force .tmp/toolchain | Out-Null
-          Invoke-WebRequest https://github.com/normlanguage/Norm/releases/download/v0.26.2/norm.exe -OutFile .tmp/toolchain/norm.exe
-          if ((Get-FileHash .tmp/toolchain/norm.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne '26fd5bb95ca97c229029d1b421f9b0411f66f35cb4a859dc976a6524ea3ec6d7') { throw 'Norm checksum mismatch.' }
+          & ./.tmp/toolchain/gradlew.bat -p .tmp/toolchain :compiler:installRuntimeDist --no-daemon
+          if ($LASTEXITCODE -ne 0) { throw 'Norm toolchain build failed.' }
       - name: Build and verify module
         run: |
-          ./scripts/build.ps1 -NormExecutable .tmp/toolchain/norm.exe
+          ./scripts/build.ps1 -NormExecutable .tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat
           git diff --exit-code -- windows/module.norm
           if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }
       - name: Verify release tag
