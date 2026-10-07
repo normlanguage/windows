@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: normlanguage/Norm
-          ref: ac9108238ea8aad00a43ab757523ce96e2564fd6
+          ref: 72efd7871380577c837807b11af68de1fcba81e2
           path: .tmp/toolchain
       - name: Build Norm
         run: |
