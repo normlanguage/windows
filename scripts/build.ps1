@@ -22,6 +22,8 @@ try {
     & (Join-Path $root 'tests/source.ps1') -NormExecutable $NormExecutable -NormHome $normHome
     & $NormExecutable package (Join-Path $root 'windows') --output (Join-Path $root 'build/repository')
     if ($LASTEXITCODE -ne 0) { throw 'Norm module packaging failed.' }
+    & $NormExecutable docs (Join-Path $root 'windows') --output (Join-Path $root 'build/api') --skill (Join-Path $root 'SKILL.md')
+    if ($LASTEXITCODE -ne 0) { throw 'Skill generation failed.' }
 } finally { $env:JDK_JAVA_OPTIONS = $previous }
 $archives = @(Get-ChildItem (Join-Path $root 'build/repository') -Recurse -Filter '*.nar')
 if ($archives.Count -ne 1) { throw 'Use a clean output directory containing one module release.' }
