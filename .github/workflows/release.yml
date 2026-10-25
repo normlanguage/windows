@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: normlanguage/Norm
-          ref: 72efd7871380577c837807b11af68de1fcba81e2
+          ref: 44837a557aa8b96374080ff9fcb762723c96ca5c
           path: .tmp/toolchain
       - name: Build Norm
         run: |
@@ -34,6 +34,8 @@ jobs:
         run: |
           ./scripts/build.ps1 -NormExecutable .tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat
           git diff --exit-code -- windows/module.norm
+      - name: Generate repository Skill
+        run: ./.tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat docs windows --output build/api --skill SKILL.md
           if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }
       - name: Verify release tag
         if: github.ref_type == 'tag'
@@ -77,3 +79,4 @@ jobs:
           test "$expected" = "$actual"
           gh release create "$RELEASE_TAG" "$archive" "$archive.sha256" --verify-tag --draft --title "Windows ${RELEASE_TAG#v}" --generate-notes
           gh release edit "$RELEASE_TAG" --draft=false
+
