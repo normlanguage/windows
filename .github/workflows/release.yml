@@ -36,10 +36,6 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Windows module resolution failed.' }
           git diff --exit-code -- windows/module.norm
           if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }
-      - name: Generate repository Skill
-        run: |
-          ./.tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat docs windows --output build/api --skill SKILL.md
-          if ($LASTEXITCODE -ne 0) { throw 'Skill generation failed.' }
       - name: Verify release tag
         if: github.ref_type == 'tag'
         env:
