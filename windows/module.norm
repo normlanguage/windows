@@ -2,7 +2,7 @@ Module module() {
   module(name: "windows", version: 4,
     exports: ["ApplicationFiles", "NativeCredentials", "StructuredText", "VerifiedArchive", "SystemSupport", "SafeTextFiles", "SessionRegistry", "DesktopTray", "DesktopActions", "AtomicTextStore", "StoreLease", "RuntimeGate", "EndpointProbe", "LocalHttpSession", "HttpResult", "ProcessSession", "LoopbackServer", "HttpExchangeHandle"],
     dependencies: [dependency(repository: "norm", name: "java.base", version: 1)],
-    binding: jarBinding(target: mavenJar(group: "dev.normlanguage", artifact: "windows", version: "3", resolution: sha256("836f06c38784a6c3bf6fade822b325110b1f0594186f817345813917b7841f55")), api: [
+    binding: jarBinding(target: mavenJar(group: "dev.normlanguage", artifact: "windows", version: "3", resolution: sha256("10f513053e67f05efa5ac4e1d2e0c9c397b809f661b36c89ecab5eb685169524")), api: [
       jarType(name: "dev.normlanguage.windows.ApplicationFiles", alias: "ApplicationFiles", members: ["materialize", "findExecutable", "executableOnPath"]),
       jarType(name: "dev.normlanguage.windows.NativeCredentials", alias: "NativeCredentials", members: ["protect", "unprotect", "loadOrCreateToken"]),
       jarType(name: "dev.normlanguage.windows.StructuredText", alias: "StructuredText", members: ["matches", "pathSegments"]),
@@ -23,6 +23,7 @@ Module module() {
       jarType(name: "dev.normlanguage.windows.HttpExchangeHandle", alias: "HttpExchangeHandle", members: ["method", "path", "header", "body", "started", "responseHeader", "begin", "write", "respond", "close"])
     ]))
 }
+
 
 
 
