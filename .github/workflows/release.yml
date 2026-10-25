@@ -33,11 +33,13 @@ jobs:
       - name: Build and verify module
         run: |
           ./scripts/build.ps1 -NormExecutable .tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat
+          if ($LASTEXITCODE -ne 0) { throw 'Windows module resolution failed.' }
           git diff --exit-code -- windows/module.norm
-      - name: Generate repository Skill
-        run: ./.tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat docs windows --output build/api --skill SKILL.md
           if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }
-      - name: Verify release tag
+      - name: Generate repository Skill
+        run: |
+          ./.tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat docs windows --output build/api --skill SKILL.md
+          if ($LASTEXITCODE -ne 0) { throw 'Skill generation failed.' }      - name: Verify release tag
         if: github.ref_type == 'tag'
         env:
           RELEASE_TAG: ${{ github.ref_name }}
@@ -79,4 +81,5 @@ jobs:
           test "$expected" = "$actual"
           gh release create "$RELEASE_TAG" "$archive" "$archive.sha256" --verify-tag --draft --title "Windows ${RELEASE_TAG#v}" --generate-notes
           gh release edit "$RELEASE_TAG" --draft=false
+
 
