@@ -21,18 +21,13 @@ jobs:
           distribution: oracle
           java-version: '25.0.2'
       - uses: gradle/actions/setup-gradle@v6
-      - uses: actions/checkout@v7
+      - uses: normlanguage/registry/.github/actions/setup-norm@90b4d247fa4f5f2b620924d2cbc0553e89843700
+        id: norm
         with:
-          repository: normlanguage/Norm
-          ref: 44837a557aa8b96374080ff9fcb762723c96ca5c
-          path: .tmp/toolchain
-      - name: Build Norm
-        run: |
-          & ./.tmp/toolchain/gradlew.bat -p .tmp/toolchain :compiler:installRuntimeDist --no-daemon
-          if ($LASTEXITCODE -ne 0) { throw 'Norm toolchain build failed.' }
+          version: 0.27.23
       - name: Build and verify module
         run: |
-          ./scripts/build.ps1 -NormExecutable .tmp/toolchain/build/compiler/norm-runtime/bin/norm.bat
+          ./scripts/build.ps1 -NormExecutable '${{ steps.norm.outputs.executable }}'
           if ($LASTEXITCODE -ne 0) { throw 'Windows module resolution failed.' }
           git diff --exit-code -- windows/module.norm
           if ($LASTEXITCODE -ne 0) { throw 'Module binding changed.' }

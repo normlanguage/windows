@@ -3,6 +3,9 @@
 param([Parameter(Mandatory)][string]$NormExecutable)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
+$license = Join-Path $root 'windows/resources/META-INF/licenses/windows'
+New-Item -ItemType Directory -Force $license | Out-Null
+Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Join-Path $license 'LICENSE') -Force
 $NormExecutable = (Resolve-Path -LiteralPath $NormExecutable).Path
 & (Join-Path $root 'gradlew.bat') -p $root test publish --no-daemon
 if ($LASTEXITCODE -ne 0) { throw 'Windows platform build or tests failed.' }

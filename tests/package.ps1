@@ -10,6 +10,11 @@ try {
     try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
     if ($manifest.module.name -ne 'windows' -or $manifest.module.version -lt 1) { throw 'Unexpected module identity.' }
     if (-not $zip.GetEntry('java/graphs.json')) { throw 'Platform dependencies must be bundled.' }
+    $license = $zip.GetEntry('resources/META-INF/licenses/windows/LICENSE')
+    if (-not $license) { throw 'Module license must be bundled.' }
+    $reader = [IO.StreamReader]::new($license.Open())
+    try { $licenseText = $reader.ReadToEnd() } finally { $reader.Dispose() }
+    if ($licenseText -cne (Get-Content -LiteralPath (Join-Path $root 'LICENSE') -Raw)) { throw 'Bundled license differs from root LICENSE.' }
 } finally { $zip.Dispose() }
 $version = $manifest.module.version
 $consumer = Join-Path $temporary 'windows/acceptance'

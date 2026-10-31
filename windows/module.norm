@@ -1,5 +1,5 @@
 Module module() {
-  module(name: "windows", version: 4,
+  module(name: "windows", version: 5,
     exports: ["ApplicationFiles", "NativeCredentials", "StructuredText", "VerifiedArchive", "SystemSupport", "SafeTextFiles", "SessionRegistry", "DesktopTray", "DesktopActions", "AtomicTextStore", "StoreLease", "RuntimeGate", "EndpointProbe", "LocalHttpSession", "HttpResult", "ProcessSession", "LoopbackServer", "HttpExchangeHandle"],
     dependencies: [dependency(repository: "norm", name: "java.base", version: 1)],
     binding: jarBinding(target: mavenJar(group: "dev.normlanguage", artifact: "windows", version: "3", resolution: sha256("10f513053e67f05efa5ac4e1d2e0c9c397b809f661b36c89ecab5eb685169524")), api: [
