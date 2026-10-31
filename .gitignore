@@ -3,3 +3,4 @@
 .norm/
 build/
 *.log
+/windows/resources/META-INF/licenses/windows/LICENSE
